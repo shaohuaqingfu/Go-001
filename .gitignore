@@ -1,0 +1,10 @@
+*/.idea
+
+将删除 .idea/
+将删除 Week03/.idea/
+将删除 Week04/docs/
+将删除 Week04/example/
+将删除 Week04/misc/
+将删除 Week04/third_party/
+将删除 Week04/tool/
+将删除 Week04/transport/http/

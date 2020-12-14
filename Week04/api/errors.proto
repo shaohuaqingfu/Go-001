@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package Week04.api.errors;
+
+// 多语言特定包名，用于源代码引用
+option go_package = "Week04/api/errors;errors";
+option java_multiple_files = true;
+option java_package = "com.github.kratos.demo.errors";
+option objc_class_prefix = "Week04ApiErrors";
+
+enum Week04Error {
+//    option (Week04.api.errors) = true;
+
+    RequestBlocked = 0;     // 请求已被封禁
+    MissingField = 1;       // 请求参数缺失
+}
