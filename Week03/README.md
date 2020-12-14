@@ -1,5 +1,7 @@
 学习笔记
 
+学习笔记暂未补完，助教辛苦了，批改的时候注意errorgroup.Go()和sync.Go()的区别哈
+
 1. CSP模型(communicating sequential processes) 顺序通信过程
 
     多个goroutine可以通过管道(channel)传输消息。
