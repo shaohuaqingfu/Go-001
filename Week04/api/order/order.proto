@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package api.order;
+
+option go_package = "Week04/api/order;order";
+
+import "Week04/api/google/api/annotations.proto";
+import public "google/protobuf/timestamp.proto";
+
+
+message OrderRequest {
+  int32 id = 1; // 订单id
+  string orderNo = 2; // 订单编号
+  int32 createUserId = 3; // 创建用户id
+}
+
+message OrderResponse {
+  int32 id = 1; // 订单id
+  string orderNo = 2; // 订单编号
+  google.protobuf.Timestamp createTime = 3; // 创建时间
+  int32 createUserId = 4; // 创建用户的id
+}
+
+message OrderListResponse {
+  repeated OrderResponse orderResponse = 1;
+}
+
+service OrderService {
+  rpc GetOrderById (OrderRequest) returns (OrderResponse) {
+    option (google.api.http) = {
+      get: "/v1/order/getById/{id}"
+    };
+  }
+  rpc GetOrderByNo (OrderRequest) returns (OrderResponse) {
+    option (google.api.http).get = "/v1/order/getByOrderNo/{orderNo}";
+  }
+  rpc GetOrderByCreateUserId (OrderRequest) returns (OrderListResponse) {
+    option (google.api.http).get = "v1/orders/getByCreateUserId/{createUserId}";
+  }
+}
