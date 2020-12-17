@@ -2,66 +2,62 @@ package service
 
 import (
 	"Week04/api/order"
+	"Week04/internal/Week04/data"
 	"context"
 	"errors"
+	"fmt"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type OrderService struct {
+	Dao *data.OrderData
 }
-
-var (
-	responses = []order.OrderResponse{
-		{
-			Id:           1,
-			OrderNo:      "order1",
-			CreateTime:   timestamppb.Now(),
-			CreateUserId: 1,
-		},
-		{
-			Id:           2,
-			OrderNo:      "order2",
-			CreateTime:   timestamppb.Now(),
-			CreateUserId: 1,
-		},
-		{
-			Id:           3,
-			OrderNo:      "order3",
-			CreateTime:   timestamppb.Now(),
-			CreateUserId: 2,
-		},
-	}
-)
 
 func (svc *OrderService) GetOrderByCreateUserId(ctx context.Context, req *order.OrderRequest) (*order.OrderListResponse, error) {
 	createUserId := req.GetCreateUserId()
-	var results []*order.OrderResponse
-	for _, response := range responses {
-		if response.GetCreateUserId() == createUserId {
-			results = append(results, &response)
-		}
+	orders, err := svc.Dao.GetByCreateUserId(createUserId)
+	if err != nil {
+		return nil, err
+	}
+	var orderResponses []*order.OrderResponse
+	for _, o := range orders {
+		orderResponses = append(orderResponses, &order.OrderResponse{
+			Id:           o.Id,
+			OrderNo:      o.OrderNo,
+			CreateTime:   timestamppb.New(o.CreateTime),
+			CreateUserId: o.CreateUserId,
+		})
 	}
 	return &order.OrderListResponse{
-		OrderResponse: results,
+		OrderResponse: orderResponses,
 	}, nil
 }
 
 func (svc *OrderService) GetOrderByNo(ctx context.Context, req *order.OrderRequest) (*order.OrderResponse, error) {
-	id := req.GetOrderNo()
-	for _, response := range responses {
-		if response.GetOrderNo() == id {
-			return &response, nil
-		}
-	}
+	//id := req.GetOrderNo()
+	//for _, response := range responses {
+	//	if response.GetOrderNo() == id {
+	//		return &response, nil
+	//	}
+	//}
 	return nil, errors.New("没有找到订单")
 }
 
 func (svc *OrderService) GetOrderById(ctx context.Context, req *order.OrderRequest) (*order.OrderResponse, error) {
 	id := req.GetId()
-	for _, response := range responses {
-		if response.GetId() == id {
-			return &response, nil
+	o, err := svc.Dao.GetById(id)
+	if err != nil {
+		fmt.Println(err)
+		if svc.Dao.IsNotExists(err) {
+			return nil, errors.New("没有找到对应订单")
 		}
+		return nil, err
 	}
-	return nil, errors.New("没有找到订单")
+	orderResponse := &order.OrderResponse{
+		Id:           o.Id,
+		OrderNo:      o.OrderNo,
+		CreateTime:   timestamppb.New(o.CreateTime),
+		CreateUserId: o.CreateUserId,
+	}
+	return orderResponse, nil
 }

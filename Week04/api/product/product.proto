@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package api.product;
+
+option go_package = "Week04/api/product;product";
+
+import "Week04/api/google/api/annotations.proto";
+import public "google/protobuf/timestamp.proto";
+
+message ProductRequest {
+  int32 id = 1; // 产品id
+  string name = 2; // 产品名称
+  int32 createUserId = 3; // 创建用户id
+}
+
+message ProductResponse {
+  int32 id = 1; // 产品id
+  string name = 2; // 产品名称
+  google.protobuf.Timestamp createTime = 3; // 创建时间
+  int32 createUserId = 4; // 创建用户的id
+}
+
+message ProductListResponse {
+  repeated ProductResponse orderResponse = 1;
+}
+
+service ProductService {
+  rpc GetProductById (ProductRequest) returns (ProductResponse) {
+    option (google.api.http) = {
+      get: "/v1/product/getById/{id}"
+    };
+  }
+  rpc GetProductByName (ProductRequest) returns (ProductResponse) {
+    option (google.api.http).get = "/v1/product/getByName/{name}";
+  }
+  rpc GetProductByCreateUserId (ProductRequest) returns (ProductListResponse) {
+    option (google.api.http).get = "/v1/products/getByCreateUserId/{createUserId}";
+  }
+}

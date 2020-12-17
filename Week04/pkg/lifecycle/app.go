@@ -69,6 +69,8 @@ func (app *App) Run(ctx context.Context) error {
 
 	// 对所有的回调初始化
 	for _, hook := range app.hooks {
+		// 设置局部变量, 防止goroutine启动后, 调用for range中的hook的地址被改变
+		hook := hook
 		// 启动停止协程
 		if hook.OnStop != nil {
 			group.Go(func(ctx context.Context) error {

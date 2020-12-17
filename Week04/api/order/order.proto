@@ -35,6 +35,6 @@ service OrderService {
     option (google.api.http).get = "/v1/order/getByOrderNo/{orderNo}";
   }
   rpc GetOrderByCreateUserId (OrderRequest) returns (OrderListResponse) {
-    option (google.api.http).get = "v1/orders/getByCreateUserId/{createUserId}";
+    option (google.api.http).get = "/v1/orders/getByCreateUserId/{createUserId}";
   }
 }
