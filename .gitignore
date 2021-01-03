@@ -8,7 +8,4 @@
 将删除 Week04/third_party/
 将删除 Week04/tool/
 将删除 Week04/transport/http/
-/.idea/modules.xml
-/.idea/vcs.xml
-/.idea/workspace.xml
-/.idea/Go-001.iml
+/.idea/
