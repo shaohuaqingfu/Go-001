@@ -1,7 +1,5 @@
 学习笔记
 
-学习笔记暂未补完，助教辛苦了，批改的时候注意errorgroup.Go()和sync.Go()的区别哈
-
 1. CSP模型(communicating sequential processes) 顺序通信过程
 
     多个goroutine可以通过管道(channel)传输消息。
@@ -40,7 +38,7 @@
        
         ![image.png](https://i.loli.net/2020/12/06/tdH8oTjN1VwSs2p.png)
         
-        G在执行同步系统调用时，会阻塞M，此时G1将M1阻塞，在M1上绑定的P将会重新绑定到新的M2，然后有M2进行调度LRQ中的G
+        G在执行同步系统调用时，会阻塞M，此时G1将M1阻塞，在M1上绑定的P将会重新绑定到新的M2，然后由M2进行调度LRQ中的G
         G1执行完之后会重新放入LRQ队尾。
     
     3. 工作窃取(working-stealing)
@@ -133,8 +131,58 @@
     
     1. Happen-Before
     
-        可见性
+        可见性，a操作的结果对b操作是可见的，说明a Happen-Before b
         
+    2. Memory-Recording
+    
+        **内存重排序**
+        
+        为了提高内存的读写效率，减少程序指令数，最大化的提高CPU利用率，CPU会对指令重排序。编译器也会进行重排序
+        
+        ```go
+        // goroutine1
+        func run1() {
+           a = 1 // (1)
+           fmt.Println(b) // (2)
+        }
+        // goroutine2
+        func run2() {
+           b = 1
+           fmt.Println(a)
+        }
+        // 这样的结果有可能会出现0 0，这里主要是因为可能会出现CPU重排序。
+        ```
+        
+        对于(1)、(2)操作，在协程中，(2)的执行是不需要依赖(1)的，所以两个操作完全可以并行。
+        
+        ![内存模型](https://ss.csdn.net/p?https://mmbiz.qpic.cn/mmbiz_png/ASQrEXvmx62Cvw3EzBCJ5VBpV3E1jgC0g5gyqtznicpHMKP06LMQRufpTicjAiazJp7dxDC3cSs1icpibQAtwTEEd8A/640?wx_fmt=png)
+        
+        当操作(1)执行时，CPU会将A的值存在CPU中的*StoreBuffer*中，此时CPU可以继续运行(2)，之后*StoreBuffer*中的数据会被逐级写入下级缓存中，
+        在L3 Cache中就可以被其他线程看到。*StoreBuffer*隐藏了(1)写数据的耗时。
+        
+        在多线程的操作中
+        
+        ![出现00的情况](https://ss.csdn.net/p?https://mmbiz.qpic.cn/mmbiz_png/ASQrEXvmx62Cvw3EzBCJ5VBpV3E1jgC0IWZ7zqlmoq3PXibxLyibLFaW63HFUJLy8B7jKYpRQacR5pl1PpcELbPw/640?wx_fmt=png)
+        
+        当两个线程的写指令还未从*StoreBuffer*写到内存中，两个线程优先执行了读操作，就会出现00的情况。
+        这种情况就是**指令的重排序**。
+        
+    3. memory barrier
+    
+        对于多线程的程序，所有的 CPU 都会提供"锁"支持，称之为barrier，或者fence。
+        
+        内存屏障，barrier指令开始之后，所有对内存的操作都会在*刷新缓存*之后发生。
+        
+        `刷新缓存：将CPU的StoreBuffer中的数据刷新到内存中`
+        
+        ![缓存结构](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9pbWFnZXMuY25ibG9ncy5jb20vY25ibG9nc19jb20vbGlsb2tlLzIwMTExMS8yMDExMTEyMDA0MzEzNDQ4ODMucG5n?x-oss-process=image/format,png)
+        
+        [缓存结构](https://blog.csdn.net/qq_21125183/article/details/80590934)
+        
+        1. cache coherence 缓存一致性
+            
+            
+            
 6. sync包
 
     1. Once 双重检查锁，执行且仅执行一次f函数
