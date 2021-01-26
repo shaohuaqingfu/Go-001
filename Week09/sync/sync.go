@@ -1,7 +1,7 @@
 package sync
 
 import (
-	"Week07/errors"
+	"Week09/errors"
 	"context"
 )
 

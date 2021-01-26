@@ -1,10 +1,10 @@
 package main
 
 import (
-	"Week07/constants"
-	"Week07/errors"
-	"Week07/model"
-	"Week07/sync"
+	"Week09/constants"
+	"Week09/errors"
+	"Week09/model"
+	"Week09/sync"
 	"bufio"
 	"bytes"
 	"context"
